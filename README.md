@@ -1,5 +1,6 @@
 # Usage
 ```
+workon nusaferide
 python scrape2.py
 python classify.py
 python export_csv.py
