@@ -37,13 +37,16 @@ tweets$acayear[c(tweets$date > "2014-09-15" & tweets$date < "2015-06-19")] <- "2
 ggplot(tweets, aes(x = month, y = avg_time, color=acayear)) + stat_summary(fun.dat = mean_se, geom='pointrange') + stat_summary(fun.dat = mean_se, geom='line') + scale_x_date(breaks = date_breaks("months"), labels = date_format("%b")) + theme(legend.position='bottom')
 
 # Distribution of wait times through the day
-ggplot(tweets, aes(x = factor(hour), y = avg_time)) + stat_summary(fun.dat = mean_se, geom='pointrange') + scale_x_discrete(labels=c("7 PM","8 PM","9 PM","10 PM","11 PM","12 AM","1 AM","2 AM")) # seq(from = 18, to = 27, by = 1)
+ggplot(tweets, aes(x = factor(hour), y = avg_time)) + stat_summary(fun.dat = mean_se, geom='pointrange') + scale_x_discrete(labels=c("7 PM","8 PM","9 PM","10 PM","11 PM","12 AM","1 AM","2 AM")) + xlab("hour")# seq(from = 18, to = 27, by = 1)
 
 # Distribution of wait times throughout the day during different days of the week
 ggplot(tweets, aes(x = hour, y = avg_time)) + stat_summary(fun.dat = mean_se) + scale_x_continuous(breaks=seq(from = 18, to = 27, by = 1)) + facet_wrap(~ wday)
 
 # Distribution of wait times throughout the day during different months of the year
 ggplot(tweets, aes(x = hour, y = avg_time)) + stat_summary(fun.dat = mean_se) + scale_x_continuous(breaks=seq(from = 18, to = 27, by = 1)) + facet_wrap(~ month_num)
+
+# Distribution of wait times through the day during different years.
+ggplot(filter(tweets, !is.na(acayear)), aes(x = hour, y = avg_time)) + stat_summary(fun.dat = mean_se) + scale_x_continuous(breaks=seq(from = 18, to = 27, by = 1)) + facet_wrap(~ acayear)
 
 summary(filter(tweets, acayear == "2012-2013")$avg_time)
 # Min.   1st Qu.  Median    Mean    3rd Qu.   Max. 
