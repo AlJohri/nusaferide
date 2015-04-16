@@ -41,10 +41,6 @@ module.exports = function (grunt) {
           livereload: true
         }
       },
-      jstest: {
-        files: ['test/spec/{,*/}*.js'],
-        tasks: ['test:watch']
-      },
       gruntfile: {
         files: ['Gruntfile.js']
       },
@@ -88,20 +84,6 @@ module.exports = function (grunt) {
           }
         }
       },
-      test: {
-        options: {
-          open: false,
-          port: 9001,
-          middleware: function(connect) {
-            return [
-              connect.static('.tmp'),
-              connect.static('test'),
-              connect().use('/bower_components', connect.static('./bower_components')),
-              connect.static(config.app)
-            ];
-          }
-        }
-      },
       dist: {
         options: {
           base: '<%= config.dist %>',
@@ -137,16 +119,6 @@ module.exports = function (grunt) {
         '!<%= config.app %>/scripts/vendor/*',
         'test/spec/{,*/}*.js'
       ]
-    },
-
-    // Mocha testing framework configuration options
-    mocha: {
-      all: {
-        options: {
-          run: true,
-          urls: ['http://<%= connect.test.options.hostname %>:<%= connect.test.options.port %>/index.html']
-        }
-      }
     },
 
     // Compiles Sass to CSS and generates necessary files if requested
@@ -194,7 +166,7 @@ module.exports = function (grunt) {
     wiredep: {
       app: {
         ignorePath: /^\/|\.\.\//,
-        src: ['<%= config.app %>/index.html']
+        src: ['<%= config.app %>/*.html']
       },
       sass: {
         src: ['<%= config.app %>/styles/{,*/}*.{scss,sass}'],
@@ -224,7 +196,8 @@ module.exports = function (grunt) {
       options: {
         dest: '<%= config.dist %>'
       },
-      html: '<%= config.app %>/index.html'
+      html: '<%= config.app %>/*.html'
+      // html: '<%= config.app %>/index.html'
     },
 
     // Performs rewrites based on rev and the useminPrepare configuration
@@ -354,7 +327,23 @@ module.exports = function (grunt) {
         'imagemin',
         'svgmin'
       ]
+    },
+
+    buildcontrol: {
+      options: {
+        dir: 'dist',
+        commit: true,
+        push: true,
+        message: 'Built %sourceName% from commit %sourceCommit% on branch %sourceBranch%'
+      },
+      pages: {
+        options: {
+          remote: 'git@github.com:AlJohri/nusaferide.git',
+          branch: 'gh-pages'
+        }
+      },
     }
+
   });
 
 
@@ -381,21 +370,6 @@ module.exports = function (grunt) {
     grunt.task.run([target ? ('serve:' + target) : 'serve']);
   });
 
-  grunt.registerTask('test', function (target) {
-    if (target !== 'watch') {
-      grunt.task.run([
-        'clean:server',
-        'concurrent:test',
-        'autoprefixer'
-      ]);
-    }
-
-    grunt.task.run([
-      'connect:test',
-      'mocha'
-    ]);
-  });
-
   grunt.registerTask('build', [
     'clean:dist',
     'wiredep',
@@ -413,7 +387,6 @@ module.exports = function (grunt) {
 
   grunt.registerTask('default', [
     'newer:jshint',
-    'test',
     'build'
   ]);
 };

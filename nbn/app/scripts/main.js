@@ -16,10 +16,10 @@ function getFilteredAndSortedData(data, filter) {
 }
 
 function makeSaferideGraph() {
-  $('#container').highcharts('StockChart', {
+  $('#graph1').highcharts('StockChart', {
 
     title: { text: 'Average Montly Saferide Wait Times' },
-    subtitle: { text: 'Data gathered from @adgdsgasd Twitter account' },
+    subtitle: { text: 'Data gathered from @NUSafeRide Twitter account' },
 
     credits: { enabled: false },
     // tooltip: { enabled: false },
@@ -56,16 +56,20 @@ $(document).ready(function() {
     saferideSeries = [
       {
         name: '2012-2013',
-        data: getFilteredAndSortedData(data, '2012-2013')
+        data: getFilteredAndSortedData(data, '2012-2013'),
+        marker: {enabled: true }
       }, {
         name: '2013-2014',
-        data: getFilteredAndSortedData(data, '2013-2014')
+        data: getFilteredAndSortedData(data, '2013-2014'),
+        marker: {enabled: true }
       }, {
         name: 'Summer 2014',
-        data: getFilteredAndSortedData(data, 'Summer 2014')
+        data: getFilteredAndSortedData(data, 'Summer 2014'),
+        marker: {enabled: true }
       }, {
         name: '2014-2015',
-        data: getFilteredAndSortedData(data, '2014-2015')
+        data: getFilteredAndSortedData(data, '2014-2015'),
+        marker: {enabled: true }
       }
     ];
 
