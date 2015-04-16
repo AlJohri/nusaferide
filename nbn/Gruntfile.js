@@ -309,6 +309,13 @@ module.exports = function (grunt) {
         cwd: '<%= config.app %>/styles',
         dest: '.tmp/styles/',
         src: '{,*/}*.css'
+      },
+      data: {
+        expand: true,
+        dot: true,
+        cwd: '<%= config.app %>/data',
+        dest: '<%= config.dist %>/data',
+        src: '{,*/}*.json'
       }
     },
 
