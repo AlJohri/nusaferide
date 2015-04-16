@@ -18,7 +18,7 @@ function getFilteredAndSortedData(data, filter) {
 function makeSaferideGraph() {
   $('#graph1').highcharts('StockChart', {
 
-    title: { text: 'Average Montly Saferide Wait Times' },
+    title: { text: 'Average Montly SafeRide Wait Times' },
     subtitle: { text: 'Data gathered from @NUSafeRide Twitter account' },
 
     credits: { enabled: false },
