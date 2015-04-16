@@ -1,0 +1,9 @@
+{
+  "name": "nbn",
+  "private": true,
+  "dependencies": {
+    "jquery": "~1.11.1",
+    "highcharts": "~4.1.5",
+    "underscore": "~1.8.3"
+  }
+}

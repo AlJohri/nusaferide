@@ -1,6 +1,12 @@
 library("dplyr")
 library("ggplot2")
 library("scales")
+library("tidyr")
+# library("RJSONIO")
+# library("rjson")
+library(df2json)
+
+require(reshape2)
 
 tweets = read.csv("tweets.csv", header=TRUE)
 
@@ -11,6 +17,12 @@ tweets$minute = as.POSIXlt(tweets$X_timestamp)$min
 tweets$wday = as.POSIXlt(tweets$X_timestamp)$wday
 tweets$year = as.POSIXlt(tweets$X_timestamp)$year + 1900
 tweets$month_num = as.POSIXlt(tweets$X_timestamp)$mon
+
+tweets$acayear <- NA
+tweets$acayear[c(tweets$date >= "2012-09-20" & tweets$date <= "2013-06-21")] <- "2012-2013"
+tweets$acayear[c(tweets$date >= "2013-09-16" & tweets$date <= "2014-06-20")] <- "2013-2014"
+tweets$acayear[c(tweets$date >= "2014-06-21" & tweets$date <= "2014-09-14")] <- "Summer 2014"
+tweets$acayear[c(tweets$date >= "2014-09-15" & tweets$date <= "2015-06-19")] <- "2014-2015"
 
 tweets$day = as.Date(cut(tweets$date, breaks = "day"))
 tweets$month = as.Date(cut(tweets$date, breaks = "month"))
@@ -28,13 +40,17 @@ tweets$hour[tweets$hour== 0] <- 24
 tweets$hour[tweets$hour== 1] <- 25
 tweets$hour[tweets$hour== 2] <- 26
 
-tweets$acayear <- NA
-tweets$acayear[c(tweets$date > "2012-09-20" & tweets$date < "2013-06-21")] <- "2012-2013"
-tweets$acayear[c(tweets$date > "2013-09-16" & tweets$date < "2014-06-20")] <- "2013-2014"
-tweets$acayear[c(tweets$date > "2014-09-15" & tweets$date < "2015-06-19")] <- "2014-2015"
-
 # Average wait time by month over time from 2012-2015
 ggplot(tweets, aes(x = month, y = avg_time, color=acayear)) + stat_summary(fun.dat = mean_se, geom='pointrange') + stat_summary(fun.dat = mean_se, geom='line') + scale_x_date(breaks = date_breaks("months"), labels = date_format("%b")) + theme(legend.position='bottom')
+graph1csv = tweets[c("month", "avg_time", "acayear")]
+graph1csv$month <- as.character(graph1csv$month)
+exportJson <- df2json(graph1csv)
+write(exportJson, "nbn/app/data/graph1.json")
+
+# graph1csv = tweets[c("X_id","month", "avg_time", "acayear")]
+# graph1csv <- dcast(graph1csv, X_id+month+avg_time ~ acayear, value.var='acayear', fill='')
+# graph1csv$X_id <- NULL
+write.csv(graph1csv, "nbn/app/data/graph1.csv", row.names=FALSE)
 
 # Distribution of wait times through the day
 ggplot(tweets, aes(x = factor(hour), y = avg_time)) + stat_summary(fun.dat = mean_se, geom='pointrange') + scale_x_discrete(labels=c("7 PM","8 PM","9 PM","10 PM","11 PM","12 AM","1 AM","2 AM")) + xlab("hour")# seq(from = 18, to = 27, by = 1)
