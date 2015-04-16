@@ -6,6 +6,8 @@ library("tidyr")
 # library("rjson")
 library(df2json)
 
+library(ggthemes)
+
 require(reshape2)
 
 tweets = read.csv("tweets.csv", header=TRUE)
@@ -41,7 +43,15 @@ tweets$hour[tweets$hour== 1] <- 25
 tweets$hour[tweets$hour== 2] <- 26
 
 # Average wait time by month over time from 2012-2015
-ggplot(tweets, aes(x = month, y = avg_time, color=acayear)) + stat_summary(fun.dat = mean_se, geom='pointrange') + stat_summary(fun.dat = mean_se, geom='line') + scale_x_date(breaks = date_breaks("months"), labels = date_format("%b")) + theme(legend.position='bottom')
+ggplot(tweets, aes(x = month, y = avg_time, color=acayear)) + 
+  stat_summary(fun.dat = mean_se, geom='pointrange') + 
+  stat_summary(fun.dat = mean_se, geom='line') + 
+  scale_x_date(breaks = date_breaks("months"), labels = date_format("%b%y")) + 
+  theme(legend.position='bottom') + theme_hc() + scale_colour_hc() + 
+  ggtitle("Safe Ride Wait Times") +
+  ylab("Average Wait Time") +
+  xlab("Month")
+
 graph1csv = tweets[c("month", "avg_time", "acayear")]
 graph1csv$month <- as.character(graph1csv$month)
 exportJson <- df2json(graph1csv)
