@@ -1,71 +1,77 @@
-var graph1 = null;
-var seriesGraph1 = null;
+var saferideSeries = null;
 
-function to_date(datestring) {
-    // return Date.parse(datestring);
-    var parts = datestring.split('-');
-    return new Date(parts[0], parts[1] - 1, parts[2]).getTime();
+function getFilteredAndSortedData(data, filter) {
+  var d = _.chain(data)
+    .filter(function(x) {
+      return x.acayear === filter && x.wait_time !== null;
+    })
+    .map(function(x) {
+        return [new Date(x.timestamp).getTime(), x.wait_time];
+    })
+    .sort(function(a, b) {
+      return a[0] - b[0];
+    })
+    .value();
+  return d;
 }
 
-function desc_start_time(x) {
-    return new Date(x[0]).getTime();
-}
+function makeSaferideGraph() {
 
-function makeGraph1() {
+    $('#container').highcharts('StockChart', {
 
-    $('#container').highcharts({
+        title: { text: 'Saferide Wait Times' },
+        subtitle: { text: 'Data gathered from @adgdsgasd Twitter account' },
 
-        title: { text: 'Global temperature change' },
-        subtitle: { text: 'Data input from CSV' },
-
-        // credits: { enabled: false },
+        credits: { enabled: false },
         // tooltip: { enabled: false },
-        // exporting: { enabled: false },
+        exporting: { enabled: false },
+        rangeSelector: { enabled: false },
+        scrollbar: { enabled: false },
+        navigator: { enabled: false },
+
         plotOptions: {
-            series: {
-                dataGrouping: {
-                    approximation: 'mean',
-                    enabled: true,
-                    forced: true,
-                }
-                animation: false,
-                states: {
-                    hover: { enabled: false }
-                }
+          series: {
+            dataGrouping: {
+              approximation: 'average',
+              enabled: true,
+              forced: true,
+              units: [
+                ['month',[1]]
+              ]
+            },
+            animation: false,
+            states: {
+                hover: { enabled: false }
             }
+          }
         },
 
-        series: seriesGraph1
+        series: saferideSeries
 
     });
 
 }
 
 
-$(function () {
+$(function() {
+    $.get('data/graph1.json', function(data) {
 
-    $.get("data/graph1.json", function(data) {
-        graph1 = data;
-        seriesGraph1 = [
-            {
-                name: "2012-2013",
-                data: _.chain(graph1).filter(function(x) { return x.acayear == "2012-2013"}).map(function(x) {return [to_date(x.month), x.avg_time]}).sortBy(desc_start_time).value(),
-            },
-            {
-                name: "2013-2014",
-                data: _.chain(graph1).filter(function(x) { return x.acayear == "2013-2014"}).map(function(x) {return [to_date(x.month), x.avg_time]}).sortBy(desc_start_time).value(),
-            },
-            {
-                name: "Summer 2014",
-                data: _.chain(graph1).filter(function(x) { return x.acayear == "Summer 2014"}).map(function(x) {return [to_date(x.month), x.avg_time]}).sortBy(desc_start_time).value(),
-            },
-            {
-                name: "2014-2015",
-                data: _.chain(graph1).filter(function(x) { return x.acayear == "2014-2015"}).map(function(x) {return [to_date(x.month), x.avg_time]}).sortBy(desc_start_time).value(),
-            }
-        ]
+        saferideSeries = [
+          {
+            name: '2012-2013',
+            data: getFilteredAndSortedData(data, '2012-2013')
+          }, {
+            name: '2013-2014',
+            data: getFilteredAndSortedData(data, '2013-2014')
+          }, {
+            name: 'Summer 2014',
+            data: getFilteredAndSortedData(data, 'Summer 2014')
+          }, {
+            name: '2014-2015',
+            data: getFilteredAndSortedData(data, '2014-2015')
+          }
+        ];
 
-        makeGraph1();
+        makeSaferideGraph();
     });
-
 });
