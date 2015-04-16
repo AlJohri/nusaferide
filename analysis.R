@@ -42,18 +42,25 @@ tweets$hour[tweets$hour== 0] <- 24
 tweets$hour[tweets$hour== 1] <- 25
 tweets$hour[tweets$hour== 2] <- 26
 
+ggplot(tweets, aes(x = date, y = avg_time, color=acayear)) + 
+  geom_line() + 
+  geom_point() +
+  scale_x_date(breaks = date_breaks("months"), labels = date_format("%b%y"))
+
 # Average wait time by month over time from 2012-2015
 ggplot(tweets, aes(x = month, y = avg_time, color=acayear)) + 
   stat_summary(fun.dat = mean_se, geom='pointrange') + 
   stat_summary(fun.dat = mean_se, geom='line') + 
   scale_x_date(breaks = date_breaks("months"), labels = date_format("%b%y")) + 
-  theme(legend.position='bottom') + theme_hc() + scale_colour_hc() + 
   ggtitle("Safe Ride Wait Times") +
   ylab("Average Wait Time") +
-  xlab("Month")
+  xlab("Month") +
+  theme(legend.position='bottom') + theme_hc() + scale_colour_hc()
+  
 
-graph1csv = tweets[c("month", "avg_time", "acayear")]
-graph1csv$month <- as.character(graph1csv$month)
+graph1csv = tweets[c("timestamp", "avg_time", "acayear")]
+names(graph1csv) <- c("timestamp", "wait_time", "acayear")
+graph1csv$timestamp <- as.character(graph1csv$timestamp)
 exportJson <- df2json(graph1csv)
 write(exportJson, "nbn/app/data/graph1.json")
 
@@ -63,7 +70,12 @@ write(exportJson, "nbn/app/data/graph1.json")
 write.csv(graph1csv, "nbn/app/data/graph1.csv", row.names=FALSE)
 
 # Distribution of wait times through the day
-ggplot(tweets, aes(x = factor(hour), y = avg_time)) + stat_summary(fun.dat = mean_se, geom='pointrange') + scale_x_discrete(labels=c("7 PM","8 PM","9 PM","10 PM","11 PM","12 AM","1 AM","2 AM")) + xlab("hour")# seq(from = 18, to = 27, by = 1)
+ggplot(tweets, aes(x = factor(hour), y = avg_time)) + stat_summary(fun.dat = mean_se, geom='pointrange') + 
+  scale_x_discrete(labels=c("7 PM","8 PM","9 PM","10 PM","11 PM","12 AM","1 AM","2 AM")) + 
+  ggtitle("Average Hourly Safe Ride Wait Times") +
+  ylab("Average Wait Time") +
+  xlab("Hour") +
+  theme(legend.position='bottom') + theme_hc() + scale_colour_hc()
 
 # Distribution of wait times throughout the day during different days of the week
 ggplot(tweets, aes(x = hour, y = avg_time)) + stat_summary(fun.dat = mean_se) + scale_x_continuous(breaks=seq(from = 18, to = 27, by = 1)) + facet_wrap(~ wday)
@@ -72,7 +84,13 @@ ggplot(tweets, aes(x = hour, y = avg_time)) + stat_summary(fun.dat = mean_se) + 
 ggplot(tweets, aes(x = hour, y = avg_time)) + stat_summary(fun.dat = mean_se) + scale_x_continuous(breaks=seq(from = 18, to = 27, by = 1)) + facet_wrap(~ month_num)
 
 # Distribution of wait times through the day during different years.
-ggplot(filter(tweets, !is.na(acayear)), aes(x = hour, y = avg_time)) + stat_summary(fun.dat = mean_se) + scale_x_continuous(breaks=seq(from = 18, to = 27, by = 1)) + facet_wrap(~ acayear)
+ggplot(filter(tweets, !is.na(acayear)), aes(x = factor(hour), y = avg_time)) + 
+  stat_summary(fun.dat = mean_se) + facet_wrap(~ acayear) + 
+  scale_x_discrete(labels=c("7 PM","8 PM","9 PM","10 PM","11 PM","12 AM","1 AM","2 AM")) + 
+  ggtitle("Average Hourly Safe Ride Wait Times by Year") +
+  ylab("Average Wait Time") +
+  xlab("Hour") +
+  theme(legend.position='bottom') + theme_hc() + scale_colour_hc()
 
 summary(filter(tweets, acayear == "2012-2013")$avg_time)
 # Min.   1st Qu.  Median    Mean    3rd Qu.   Max. 
