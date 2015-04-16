@@ -108,6 +108,7 @@ $(document).ready(function() {
           marker: {enabled: true }
         }
       ];
+      makeGraph1();
     });
   }
 
@@ -132,7 +133,7 @@ $(document).ready(function() {
               pointFormat: '(error range: {point.low:.2f}-{point.high:.2f})<br/>'
           }
         }
-      ]
+      ];
       makeGraph2();
     });
   }
