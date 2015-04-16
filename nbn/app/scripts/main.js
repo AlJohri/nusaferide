@@ -19,7 +19,7 @@ function makeSaferideGraph() {
 
     $('#container').highcharts('StockChart', {
 
-        title: { text: 'Saferide Wait Times' },
+        title: { text: 'Average Monthly Saferide Wait Times' },
         subtitle: { text: 'Data gathered from @adgdsgasd Twitter account' },
 
         credits: { enabled: false },
