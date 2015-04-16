@@ -56,18 +56,6 @@ ggplot(tweets, aes(x = month, y = avg_time, color=acayear)) +
   ylab("Average Wait Time") +
   xlab("Month") +
   theme(legend.position='bottom') + theme_hc() + scale_colour_hc()
-  
-
-graph1csv = tweets[c("timestamp", "avg_time", "acayear")]
-names(graph1csv) <- c("timestamp", "wait_time", "acayear")
-graph1csv$timestamp <- as.character(graph1csv$timestamp)
-exportJson <- df2json(graph1csv)
-write(exportJson, "nbn/app/data/graph1.json")
-
-# graph1csv = tweets[c("X_id","month", "avg_time", "acayear")]
-# graph1csv <- dcast(graph1csv, X_id+month+avg_time ~ acayear, value.var='acayear', fill='')
-# graph1csv$X_id <- NULL
-write.csv(graph1csv, "nbn/app/data/graph1.csv", row.names=FALSE)
 
 # Distribution of wait times through the day
 ggplot(tweets, aes(x = factor(hour), y = avg_time)) + stat_summary(fun.dat = mean_se, geom='pointrange') + 
@@ -106,3 +94,29 @@ summary(filter(tweets, acayear == "2014-2015")$avg_time)
 summary(tweets[c(tweets$month_num == 1 & tweets$acayear == "2012-2013"),]$avg_time)
 summary(tweets[c(tweets$month_num == 1 & tweets$acayear == "2013-2014"),]$avg_time)
 summary(tweets[c(tweets$month_num == 1 & tweets$acayear == "2014-2015"),]$avg_time)
+
+graph1csv = tweets[c("timestamp", "avg_time", "acayear")]
+names(graph1csv) <- c("timestamp", "wait_time", "acayear")
+graph1csv$timestamp <- as.character(graph1csv$timestamp)
+exportJson <- df2json(graph1csv)
+write(exportJson, "nbn/app/data/graph1.json")
+write.csv(graph1csv, "nbn/app/data/graph1.csv", row.names=FALSE)
+
+graph2csv = tweets[c("hour", "avg_time")]
+graph2csv <- graph2csv %>% group_by(hour) %>% 
+  summarise(n = n(), mean = mean(avg_time), sd = sd(avg_time)) %>% 
+  mutate(se = sd/sqrt(n), lci = mean + qnorm(0.025)*se, uci = mean + qnorm(0.975)*se
+)
+exportJson <- df2json(graph2csv)
+write(exportJson, "nbn/app/data/graph2.json")
+write.csv(graph2csv, "nbn/app/data/graph2.csv", row.names=FALSE)
+
+graph3csv = tweets[c("hour", "avg_time", "acayear")]
+graph3csv <- graph3csv %>% filter(acayear != "Summer 2014")
+graph3csv <- graph3csv %>% group_by(hour, acayear) %>% 
+  summarise(n = n(), mean = mean(avg_time), sd = sd(avg_time)) %>% 
+  mutate(se = sd/sqrt(n), lci = mean + qnorm(0.025)*se, uci = mean + qnorm(0.975)*se
+)
+exportJson <- df2json(graph3csv)
+write(exportJson, "nbn/app/data/graph3.json")
+write.csv(graph3csv, "nbn/app/data/graph3.csv", row.names=FALSE)

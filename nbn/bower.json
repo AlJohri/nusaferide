@@ -8,7 +8,10 @@
   },
   "overrides": {
     "highstock": {
-      "main": "js/highstock.src.js"
+      "main": [
+      	"js/highstock.src.js",
+      	"js/highcharts-more.src.js"
+      ]
     }
   }
 }
